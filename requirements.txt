@@ -1,6 +1,5 @@
 numpy
 tensorflow
 classification_models
-seaborn
 pandas
 matplotlib

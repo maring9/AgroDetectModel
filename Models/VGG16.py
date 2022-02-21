@@ -3,7 +3,8 @@ from tensorflow.keras.applications import VGG16
 
 def get_vgg16_architecture(include_top=True, weights='imagenet',
                            input_shape=(224, 224, 3)):
-    """Helper functinon to create VGG16 model
+    """
+        Helper functinon to create VGG16 model
 
     Args:
         include_top (bool, optional):   Whether to include the 3 fully-

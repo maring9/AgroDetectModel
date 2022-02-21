@@ -4,7 +4,8 @@ from tensorflow.keras.models import Sequential
 
 
 def get_alexnet_architecture():
-    """Helper function to create AlexNet model
+    """
+       Helper function to create AlexNet model
 
     Returns:
         keras.Model: Model instance (AlexNet Architecture)

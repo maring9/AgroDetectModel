@@ -4,6 +4,7 @@ from tensorflow.keras.applications import EfficientNetV2B0
 def get_efficientnetb0_architecture(include_top=True, weights='imagenet',
                                     input_shape=None):
     """
+        Helper functinon to create EfficientNetV2B0 model
 
     Args:
         include_top (bool, optional):   Whether to include the fully-connected

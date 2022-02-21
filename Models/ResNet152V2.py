@@ -4,7 +4,8 @@ from tensorflow.keras.applications import ResNet152V2
 def get_resnet152v2_architecture(include_top=True,
                                  weights='imagenet',
                                  input_shape=(224, 224, 3)):
-    """Helper functinon to create ResNet152V2 model
+    """
+        Helper functinon to create ResNet152V2 model
 
     Args:
         include_top (bool, optional):   Whether to include the fully-connected

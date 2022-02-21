@@ -4,7 +4,8 @@ from tensorflow.keras.applications import InceptionV3
 def get_inceptionv3_architecture(include_top=True,
                                  weights='imagenet',
                                  input_shape=(299, 299, 3)):
-    """Helper functinon to create InceptionV3 model
+    """
+        Helper functinon to create InceptionV3 model
 
     Args:
         include_top (bool, optional):   Whether to include the fully-connected

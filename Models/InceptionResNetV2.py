@@ -5,6 +5,7 @@ def get_inceptionresnetv2_architecture(include_top=True,
                                        weights='imagenet',
                                        input_shape=(299, 299, 3)):
     """
+        Helper functinon to create InceptionResNetV2 model
 
     Args:
         include_top (bool, optional):   Whether to include the fully-connected

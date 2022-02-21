@@ -108,7 +108,6 @@ class ConfusionMatrix(Callback):
 
         figure = self.plot_confusion_matrix(confusion_matrix_)
 
-        cm_image = self.plot_confusion_matrix(figure)
+        cm_image = self.plot_to_image(figure)
 
-        with self.file_writer:
-            image("Confusion Matrix", cm_image, step=epoch)
+        image("Confusion Matrix", cm_image, step=epoch)

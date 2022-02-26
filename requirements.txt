@@ -3,3 +3,6 @@ tensorflow
 classification_models
 pandas
 matplotlib
+dvc
+horovod
+scikit-learn

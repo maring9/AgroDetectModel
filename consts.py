@@ -1,4 +1,4 @@
-BASE_LOG_DIR = './logs'
+BASE_LOG_DIR = '.logs'
 
 CLASSES = ['Apple Black rot', 'Apple Cedar rust', 'Apple scab',
            'Apple healthy', 'Blueberry healthy', 'Cherry healthy',
@@ -15,3 +15,7 @@ CLASSES = ['Apple Black rot', 'Apple Cedar rust', 'Apple scab',
            'Tomato Early blight', 'Tomato healthy', 'Tomato Late blight',
            'Tomato Leaf Mold', 'Tomat mosaic virus', 'Tomato Target Spot',
            'Tomato Two spotted spider mite', 'Tomato Yellow Leaf Curl Virus']
+
+NUM_CLASSES = 38
+
+IMAGE_DIMS = (256, 256, 3)

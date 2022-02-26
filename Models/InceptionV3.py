@@ -1,9 +1,12 @@
+from consts import IMAGE_DIMS, NUM_CLASSES
+from tensorflow.keras import Model
 from tensorflow.keras.applications import InceptionV3
+from tensorflow.keras.layers import Dense
 
 
 def get_inceptionv3_architecture(include_top=True,
                                  weights='imagenet',
-                                 input_shape=(299, 299, 3)):
+                                 input_shape=IMAGE_DIMS):
     """
         Helper functinon to create InceptionV3 model
 
@@ -25,4 +28,9 @@ def get_inceptionv3_architecture(include_top=True,
     inceptionv3 = InceptionV3(include_top=include_top,
                               weights=weights,
                               input_shape=input_shape)
-    return inceptionv3
+
+    outputlayer = Dense(NUM_CLASSES, activation='softmax')(inceptionv3.layers[-2].output)
+
+    model = Model(inceptionv3.input, outputlayer)
+
+    return model

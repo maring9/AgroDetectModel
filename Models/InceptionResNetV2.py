@@ -1,9 +1,12 @@
+from consts import IMAGE_DIMS, NUM_CLASSES
+from tensorflow.keras import Model
 from tensorflow.keras.applications import InceptionResNetV2
+from tensorflow.keras.layers import Dense
 
 
 def get_inceptionresnetv2_architecture(include_top=True,
                                        weights='imagenet',
-                                       input_shape=(299, 299, 3)):
+                                       input_shape=IMAGE_DIMS):
     """
         Helper functinon to create InceptionResNetV2 model
 
@@ -26,4 +29,9 @@ def get_inceptionresnetv2_architecture(include_top=True,
     inceptionresnetv2 = InceptionResNetV2(include_top=include_top,
                                           weights=weights,
                                           input_shape=input_shape)
-    return inceptionresnetv2
+
+    outputlayer = Dense(NUM_CLASSES, activation='softmax')(inceptionresnetv2.layers[-2].output)
+
+    model = Model(inceptionresnetv2.input, outputlayer)
+
+    return model

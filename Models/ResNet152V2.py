@@ -1,9 +1,12 @@
+from consts import IMAGE_DIMS, NUM_CLASSES
+from tensorflow.keras import Model
 from tensorflow.keras.applications import ResNet152V2
+from tensorflow.keras.layers import Dense
 
 
 def get_resnet152v2_architecture(include_top=True,
                                  weights='imagenet',
-                                 input_shape=(224, 224, 3)):
+                                 input_shape=IMAGE_DIMS):
     """
         Helper functinon to create ResNet152V2 model
 
@@ -27,4 +30,8 @@ def get_resnet152v2_architecture(include_top=True,
                               weights=weights,
                               input_shape=input_shape)
 
-    return resnet152v2
+    outputlayer = Dense(NUM_CLASSES, activation='softmax')(resnet152v2.layers[-2].output)
+
+    model = Model(resnet152v2.input, outputlayer)
+
+    return model

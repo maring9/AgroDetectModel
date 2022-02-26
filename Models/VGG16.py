@@ -1,8 +1,11 @@
+from consts import IMAGE_DIMS, NUM_CLASSES
+from tensorflow.keras import Model
 from tensorflow.keras.applications import VGG16
+from tensorflow.keras.layers import Dense
 
 
 def get_vgg16_architecture(include_top=True, weights='imagenet',
-                           input_shape=(224, 224, 3)):
+                           input_shape=IMAGE_DIMS):
     """
         Helper functinon to create VGG16 model
 
@@ -24,4 +27,8 @@ def get_vgg16_architecture(include_top=True, weights='imagenet',
                   weights=weights,
                   input_shape=input_shape)
 
-    return vgg16
+    outputlayer = Dense(NUM_CLASSES, activation='softmax')(vgg16.layers[-2].output)
+
+    model = Model(vgg16.input, outputlayer)
+
+    return model

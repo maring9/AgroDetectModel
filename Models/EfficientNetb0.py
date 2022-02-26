@@ -1,8 +1,11 @@
+from consts import IMAGE_DIMS, NUM_CLASSES
+from tensorflow.keras import Model
 from tensorflow.keras.applications import EfficientNetV2B0
+from tensorflow.keras.layers import Dense
 
 
 def get_efficientnetb0_architecture(include_top=True, weights='imagenet',
-                                    input_shape=None):
+                                    input_shape=IMAGE_DIMS):
     """
         Helper functinon to create EfficientNetV2B0 model
 
@@ -25,4 +28,8 @@ def get_efficientnetb0_architecture(include_top=True, weights='imagenet',
                                      weights=weights,
                                      input_shape=input_shape)
 
-    return efficient_net
+    outputlayer = Dense(NUM_CLASSES, activation='softmax')(efficient_net.layers[-2].output)
+
+    model = Model(efficient_net.input, outputlayer)
+
+    return model

@@ -128,4 +128,10 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-/PlantVillage
+*.ipynb
+
+*.h5
+
+logs
+
+test_data

@@ -4,8 +4,8 @@ TRAIN_DIR = '/home/marin/Desktop/Dataset/PlantVillage/train'
 VAL_DIR = '/home/marin/Desktop/Dataset/PlantVillage/validation'
 TEST_DIR = '/home/marin/Desktop/Dataset/PlantVillage/testing'
 
-TEST_IMAGES = '/home/marin/Desktop/BachelorThesis/test data/inputs.npy'
-TEST_LABELS = '/home/marin/Desktop/BachelorThesis/test data/labels.npy'
+TEST_IMAGES = '/home/marin/Desktop/BachelorThesis/test_data/inputs.npy'
+TEST_LABELS = '/home/marin/Desktop/BachelorThesis/test_data/labels.npy'
 
 CLASSES = ['Apple Black rot', 'Apple Cedar rust', 'Apple scab',
            'Apple healthy', 'Blueberry healthy', 'Cherry healthy',

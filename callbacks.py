@@ -1,7 +1,7 @@
 import itertools
 from datetime import datetime
 from io import BytesIO
-
+import tensorflow as tf
 import matplotlib.pyplot as plt
 import numpy as np
 from six.moves import range
@@ -12,7 +12,7 @@ from tensorflow.image import decode_png
 from tensorflow.keras.callbacks import (Callback, EarlyStopping,
                                         ModelCheckpoint, ReduceLROnPlateau,
                                         TensorBoard)
-from tensorflow.summary import create_file_writer, image, scalar
+from tensorflow.summary import create_file_writer, scalar
 
 from consts import BASE_LOG_DIR, CLASSES
 
@@ -33,8 +33,7 @@ class ConfusionMatrix(Callback):
         """
 
         super(ConfusionMatrix, self).__init__()
-        self.inputs = data[0]
-        self.labels = data[1]
+        self.data = data
 
         self.tag = datetime.now().strftime("%Y_%m_%d-%H_%M_%S")
         LOG_DIR = f"{BASE_LOG_DIR}/confusion_matrix/" + self.tag
@@ -102,10 +101,19 @@ class ConfusionMatrix(Callback):
 
         return figure
 
-    def on_train_end(self, epoch, logs=None):
+    def on_epoch_end(self, epoch, logs=None):
         logs = logs or {}
-
-        predictions = self.model.predict(self.inputs)
+        self.label = None
+        for i, (image, label) in enumerate(self.data):
+            print('Prediction on batch: ', i)
+            pred = self.model.predict(image)
+            if i == 0:
+                predictions = np.copy(pred)
+                self.labels = np.copy(label)
+            else:
+                predictions = np.append(predictions, np.stack(predictions), axis=0)
+                self.labels = np.append(self.labels, np.stack(label), axis=0)
+        predictions = predictions[32:]
         predictions = np.argmax(predictions, axis=1)
 
         confusion_matrix_ = confusion_matrix(self.labels, predictions)
@@ -114,7 +122,7 @@ class ConfusionMatrix(Callback):
 
         cm_image = self.plot_to_image(figure)
 
-        image("Confusion Matrix", cm_image, step=epoch)
+        tf.summary.image("Confusion Matrix", cm_image, step=epoch)
 
 
 def get_earlystopping_callback(monitor='val_loss',

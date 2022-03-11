@@ -1,11 +1,10 @@
 BASE_LOG_DIR = 'logs'
 
-TRAIN_DIR = '/home/marin/Desktop/Dataset/PlantVillage/train'
-VAL_DIR = '/home/marin/Desktop/Dataset/PlantVillage/validation'
-TEST_DIR = '/home/marin/Desktop/Dataset/PlantVillage/testing'
+TRAIN_DIR = '/home/marin/Desktop/Dataset/PlantVillageResized/train'
+VAL_DIR = '/home/marin/Desktop/Dataset/PlantVillageResized/validation'
+TEST_DIR = '/home/marin/Desktop/Dataset/PlantVillageResized/testing'
 
-TEST_IMAGES = '/home/marin/Desktop/BachelorThesis/test_data/inputs.npy'
-TEST_LABELS = '/home/marin/Desktop/BachelorThesis/test_data/labels.npy'
+MODEL_CHECKPOINTS = '/home/marin/Desktop/BachelorThesis/Checkpoints'
 
 CLASSES = ['Apple Black rot', 'Apple Cedar rust', 'Apple scab',
            'Apple healthy', 'Blueberry healthy', 'Cherry healthy',
@@ -18,11 +17,12 @@ CLASSES = ['Apple Black rot', 'Apple Cedar rust', 'Apple scab',
            'Pepper bell healthy', 'Potato Early blight', 'Potato healthy',
            'Potato Late blight', 'Raspberry healthy', 'Soybean healthy',
            'Squash Powdery mildew', 'Strawberry healthy',
-           'Strawberry Leaf scorch', 'Totamo Bacterial spot',
+           'Strawberry Leaf scorch', 'Tomato Bacterial spot',
            'Tomato Early blight', 'Tomato healthy', 'Tomato Late blight',
-           'Tomato Leaf Mold', 'Tomat mosaic virus', 'Tomato Target Spot',
+           'Tomato Leaf Mold', 'Tomato mosaic virus',
+           'Tomato Septoria leaf spot', 'Tomato Target Spot',
            'Tomato Two spotted spider mite', 'Tomato Yellow Leaf Curl Virus']
 
 NUM_CLASSES = 38
 
-IMAGE_DIMS = (256, 256, 3)
+IMAGE_DIMS = (150, 150, 3)

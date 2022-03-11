@@ -1,9 +1,10 @@
 from tensorflow.keras import Model
 from tensorflow.keras.applications import (VGG16, EfficientNetB7,
                                            InceptionResNetV2, InceptionV3,
-                                           ResNet152V2)
+                                           MobileNetV2, ResNet152V2)
 from tensorflow.keras.layers import (BatchNormalization, Conv2D, Dense,
-                                     Dropout, Flatten, MaxPool2D)
+                                     Dropout, Flatten, GlobalAveragePooling2D,
+                                     MaxPool2D)
 from tensorflow.keras.models import Sequential
 
 from consts import IMAGE_DIMS, NUM_CLASSES
@@ -39,7 +40,7 @@ def get_alexnet_architecture():
         Dense(4096, activation='relu'),
         Dropout(0.5),
         Dense(NUM_CLASSES, activation='softmax')
-    ])
+    ], name='AlexNet')
 
     return alexnet
 
@@ -70,7 +71,7 @@ def get_efficientnetb7_architecture(include_top=True, weights=None,
 
     outputlayer = Dense(NUM_CLASSES, activation='softmax')(efficient_net.layers[-2].output)
 
-    model = Model(efficient_net.input, outputlayer)
+    model = Model(efficient_net.input, outputlayer, name='EfficientNetB7')
 
     return model
 
@@ -103,7 +104,8 @@ def get_inceptionresnetv2_architecture(include_top=True,
 
     outputlayer = Dense(NUM_CLASSES, activation='softmax')(inceptionresnetv2.layers[-2].output)
 
-    model = Model(inceptionresnetv2.input, outputlayer)
+    model = Model(inceptionresnetv2.input, outputlayer,
+                  name='InceptionResnetV2')
 
     return model
 
@@ -135,7 +137,7 @@ def get_inceptionv3_architecture(include_top=True,
 
     outputlayer = Dense(NUM_CLASSES, activation='softmax')(inceptionv3.layers[-2].output)
 
-    model = Model(inceptionv3.input, outputlayer)
+    model = Model(inceptionv3.input, outputlayer, name='InceptionV3')
 
     return model
 
@@ -168,7 +170,7 @@ def get_resnet152v2_architecture(include_top=True,
 
     outputlayer = Dense(NUM_CLASSES, activation='softmax')(resnet152v2.layers[-2].output)
 
-    model = Model(resnet152v2.input, outputlayer)
+    model = Model(resnet152v2.input, outputlayer, name='ResNet152V2')
 
     return model
 
@@ -199,6 +201,23 @@ def get_vgg16_architecture(include_top=True,
 
     outputlayer = Dense(NUM_CLASSES, activation='softmax')(vgg16.layers[-2].output)
 
-    model = Model(vgg16.input, outputlayer)
+    model = Model(vgg16.input, outputlayer, name='VGG16')
+
+    return model
+
+
+def get_mobilenetv2_architecture(include_top=True,
+                                 weights=None,
+                                 input_shape=IMAGE_DIMS):
+
+    mobilenetv2 = MobileNetV2(include_top=False,
+                              weights=weights,
+                              input_shape=input_shape)
+
+    x = mobilenetv2.output
+    x = GlobalAveragePooling2D()(x)
+    outputlayer = Dense(NUM_CLASSES, activation='softmax')(x)
+
+    model = Model(mobilenetv2.input, outputlayer, name='MobileNetv2')
 
     return model

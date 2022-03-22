@@ -1,0 +1,5 @@
+outs:
+- md5: 71bcafdb029647102bd2169ed524ca78.dir
+  size: 136248611
+  nfiles: 4
+  path: AlexNet

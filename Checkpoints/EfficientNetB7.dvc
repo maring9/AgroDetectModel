@@ -1,0 +1,5 @@
+outs:
+- md5: ab5bca3155bd0461299361be629794ec.dir
+  size: 274801257
+  nfiles: 4
+  path: EfficientNetB7

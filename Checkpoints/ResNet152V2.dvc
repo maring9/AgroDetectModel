@@ -1,0 +1,5 @@
+outs:
+- md5: 2d891a75876fb2b5a1e6ad2ad6fa00b2.dir
+  size: 245601195
+  nfiles: 4
+  path: ResNet152V2

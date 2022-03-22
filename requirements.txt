@@ -1,0 +1,9 @@
+numpy
+tensorflow
+pandas
+matplotlib
+dvc
+horovod
+scikit-learn
+seaborn
+pillow

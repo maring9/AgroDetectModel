@@ -1,0 +1,5 @@
+outs:
+- md5: 71ba93709323946aa8d92a5ec125df0c.dir
+  size: 12912274
+  nfiles: 4
+  path: MobileNetv2

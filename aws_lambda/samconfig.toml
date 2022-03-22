@@ -1,0 +1,12 @@
+version = 0.1
+[default]
+[default.deploy]
+[default.deploy.parameters]
+stack_name = "plant-disease"
+s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-1nf4idg8e4lni"
+s3_prefix = "plant-disease"
+region = "us-east-1"
+confirm_changeset = true
+capabilities = "CAPABILITY_IAM"
+disable_rollback = true
+image_repositories = ["InferenceFunction=624966096924.dkr.ecr.us-east-1.amazonaws.com/plantdisease35ca7703/inferencefunction7c73919drepo"]

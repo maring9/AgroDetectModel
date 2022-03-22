@@ -3,16 +3,13 @@ from horovod.tensorflow import keras as hvd
 
 from callbacks import (get_earlystopping_callback,
                        get_modelcheckpoint_callback, get_tensorboard_callback)
-from consts import TRAIN_DIR, VAL_DIR
-from models import (get_alexnet_architecture, get_efficientnetb7_architecture,
-                    get_inceptionresnetv2_architecture,
-                    get_inceptionv3_architecture, get_mobilenetv2_architecture,
-                    get_resnet152v2_architecture, get_vgg16_architecture)
+from consts import BATCH_SIZE, EPOCHS, IMAGE_SIZE, TRAIN_DIR, VAL_DIR
+from utils import MODELS
 
 # Horovod initialization for distributed learning
 hvd.init()
 
-
+# GPU configuration for distributed learning
 gpus = tf.config.experimental.list_physical_devices('GPU')
 for gpu in gpus:
     tf.config.experimental.set_memory_growth(gpu, True)
@@ -20,69 +17,74 @@ for gpu in gpus:
 if gpus:
     tf.config.experimental.set_visible_devices(gpus[hvd.local_rank()], 'GPU')
 
-# Batch
-batch_size = 32
-
 # Train dataset
 train_ds = tf.keras.utils.image_dataset_from_directory(TRAIN_DIR,
-                                                       image_size=(150, 150),
-                                                       batch_size=batch_size,
+                                                       image_size=IMAGE_SIZE,
+                                                       batch_size=BATCH_SIZE,
                                                        seed=42)
-# Val dataset
+# Validation dataset
 val_ds = tf.keras.utils.image_dataset_from_directory(VAL_DIR,
-                                                     image_size=(150, 150),
-                                                     batch_size=batch_size,
+                                                     image_size=IMAGE_SIZE,
+                                                     batch_size=BATCH_SIZE,
                                                      seed=42)
 
 
-# Normalized train and val dataset
+# Normalization layer used to normalize train / val dataset
 normalization_layer = tf.keras.layers.Rescaling(1./255)
+
+# Normalizing train and validation dataset
 train_ds = train_ds.map(lambda x, y: (normalization_layer(x), y))
 val_ds = val_ds.map(lambda x, y: (normalization_layer(x), y))
 
 
-# Models
-InceptionResnetV2 = get_inceptionresnetv2_architecture(weights=None)
-AlexNet = get_alexnet_architecture()
-EfficientNetB7 = get_efficientnetb7_architecture(weights=None)
-MobileNetV2 = get_mobilenetv2_architecture(weights=None)
-VGG16_ = get_vgg16_architecture(weights=None)
-ResNet152v2 = get_resnet152v2_architecture(weights=None)
-InceptionV3 = get_inceptionv3_architecture(weights=None)
+# Main loop that trains all the model architectures established
+for architecture in list(MODELS.keys()):
+    # Load model architecture
+    model = MODELS[architecture]
 
-# InceptionResnetV2 Trained
-# AlexNet Trained
-# MobileNetV2 Trained
-# Using Adam lr 0.001
-# ResNet152v2
-# InceptionV3
-#EfficientNetB7
-
-# VGG untrained
-models = [InceptionV3]
-
-for model in models:
+    # Initialize optimizer used for model training
+    # Learning rate is scaled by the number of horovod workers
     optimizer = tf.optimizers.Adam(learning_rate=1e-3 * hvd.size())
+
+    # Stock tensorflow optimizer is wrapped as horovod optimizer
+    # used for distributed learning
     optimizer = hvd.DistributedOptimizer(optimizer)
 
+    # Compile model with the optimizer, loss function and metric
     model.compile(optimizer=optimizer,
                   loss=tf.keras.losses.SparseCategoricalCrossentropy(),
                   metrics=['accuracy'])
 
-    horo = hvd.callbacks.BroadcastGlobalVariablesCallback(0)
+    # Horovod callback used to broadcast all the initial gradients
+    # to the same starting point
+    hvd_init = hvd.callbacks.BroadcastGlobalVariablesCallback(0)
 
-# avg_worker = hvd.callbacks.MetricAverageCallback()
-# cm = ConfusionMatrix(val_ds)
+    # Callback to stop training if the model does not improve
+    early_stopping = get_earlystopping_callback(patience=10,
+                                                best_weights=False)
 
-    es = get_earlystopping_callback(patience=10, best_weights=False)
-    tb = get_tensorboard_callback()
+    # Tensorboard callback used for monitoring and vizualization during
+    # model training
+    tensorboard = get_tensorboard_callback()
 
-    callbacks_ = [horo, tb, es]
+    # List of callbacks
+    callbacks_ = [hvd_init, tensorboard, early_stopping]
 
+    # Only one hvd worker should save the checkpoints to avoid file corruption
     if hvd.rank() == 0:
+        # Model directory where to save the checkpoints
         name = "Checkpoints/{}".format(model.name)
-        path = name + "/{epoch:02d}-{val_accuracy:.2f}"
-        mc = get_modelcheckpoint_callback(path)
-        callbacks_.append(mc)
 
-    model.fit(train_ds, validation_data=val_ds, epochs=50, callbacks=callbacks_)
+        # Full checkpoint path and name
+        path = name + "/{epoch:02d}-{val_accuracy:.2f}"
+
+        # Callback used to save model checkpoints during training
+        model_checkpoint = get_modelcheckpoint_callback(path)
+
+        callbacks_.append(model_checkpoint)
+
+    # Train model
+    model.fit(train_ds,
+              validation_data=val_ds,
+              epochs=EPOCHS,
+              callbacks=callbacks_)

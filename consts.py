@@ -1,13 +1,19 @@
+# Constants
+
 BASE_LOG_DIR = 'logs'
 
 TRAIN_DIR = '/home/marin/Desktop/Dataset/PlantVillageResized/train'
 VAL_DIR = '/home/marin/Desktop/Dataset/PlantVillageResized/validation'
 TEST_DIR = '/home/marin/Desktop/Dataset/PlantVillageResized/testing'
 
+BATCH_SIZE = 32
+
+EPOCHS = 50
+
 MODEL_CHECKPOINTS = '/home/marin/Desktop/BachelorThesis/Checkpoints'
 
-CLASSES = ['Apple Black rot', 'Apple Cedar rust', 'Apple scab',
-           'Apple healthy', 'Blueberry healthy', 'Cherry healthy',
+CLASSES = ['Apple Black rot', 'Apple Cedar rust', 'Apple healthy',
+           'Apple scab', 'Blueberry healthy', 'Cherry healthy',
            'Cherry Powdery mildew', 'Corn Cercospora Gray laef spot',
            'Corn Common rust', 'Corn healthy', 'Corn Northern Leaf Bligh',
            'Grape Black rot', 'Grape Esca Black Measles', 'Grape healthy',
@@ -26,3 +32,4 @@ CLASSES = ['Apple Black rot', 'Apple Cedar rust', 'Apple scab',
 NUM_CLASSES = 38
 
 IMAGE_DIMS = (150, 150, 3)
+IMAGE_SIZE = (150, 150)

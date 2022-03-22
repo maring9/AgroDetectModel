@@ -1,22 +1,13 @@
-import gc
-import itertools
 from datetime import datetime
-from io import BytesIO
 
-import matplotlib.pyplot as plt
 import numpy as np
-import tensorflow as tf
-from six.moves import range
-from sklearn.metrics import (accuracy_score, confusion_matrix, f1_score,
-                             precision_score, recall_score)
-from tensorflow import expand_dims
-from tensorflow.image import decode_png
+from sklearn.metrics import f1_score, precision_score, recall_score
 from tensorflow.keras.callbacks import (Callback, EarlyStopping,
                                         ModelCheckpoint, ReduceLROnPlateau,
                                         TensorBoard)
 from tensorflow.summary import create_file_writer, scalar
 
-from consts import BASE_LOG_DIR, CLASSES
+from consts import BASE_LOG_DIR
 
 
 def get_earlystopping_callback(monitor='val_accuracy',
@@ -61,6 +52,8 @@ class Metrics(Callback):
     """
         Custom callback class to calculate F1-Score, Precision and Recall
         metrics. The metrics are logged and plotted using TesorBoard
+
+        NOTE: NOT USED DO TO MEMORY LIMITATION
     """
 
     def __init__(self, data):

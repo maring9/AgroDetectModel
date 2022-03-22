@@ -11,6 +11,8 @@ from tensorflow import keras
 
 from consts import TRAIN_DIR
 
+# TODO FINISH SCRIPT
+
 np.random.seed(42)
 
 batch_size = 8

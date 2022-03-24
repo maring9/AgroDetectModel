@@ -3,22 +3,31 @@ import base64
 import json
 from io import BytesIO
 
+import boto3
 import numpy as np
 import tensorflow as tf
 from PIL import Image
 
+from aws_s3 import upload_image
 from consts import CLASSES, IMAGE_SIZE
 
 # Path to load model from
-model_file = '/opt/ml/model'
+MODEL_FILE = '/opt/ml/model'
 
 # Load model, will only be loaded once per cold start
-model = tf.keras.models.load_model(model_file)
+MODEL = tf.keras.models.load_model(MODEL_FILE)
+
+# S3 client used to log input image
+S3_CLIENT = boto3.client('s3')
+
+# Bucket name where the image is saved
+BUCKET_NAME = 'plant-disease-input-images'
 
 
 def preprocess_payload(event):
     """
-
+        Function to preprocess the image payload for inference.
+        The image is saved to an S3 bucket for logging
 
     Args:
         event (request):    Request containing the image as payload to run
@@ -35,27 +44,30 @@ def preprocess_payload(event):
     image_bytes = event['body'].encode('utf-8')
 
     # Open the image gotten as payload
-    image = Image.open(BytesIO(base64.b64decode(image_bytes)))
-    image = image.convert(mode='RGB')
+    original_image = Image.open(BytesIO(base64.b64decode(image_bytes)))
+    original_image = original_image.convert(mode='RGB')
 
     # Resize image to the resolution expected by the model
-    image = image.resize(IMAGE_SIZE)
+    inference_image = original_image.resize(IMAGE_SIZE)
 
     # Convert image to numpy array and normalize to [0, 1]
-    image = np.array(image).astype('float32') / 255
+    inference_image = np.array(inference_image).astype('float32') / 255
 
     # Add batch dimension for inference
-    image = np.expand_dims(image, axis=0)
+    inference_image = np.expand_dims(inference_image, axis=0)
 
-    return image
+    return inference_image, original_image
 
 
 def lambda_handler(event, context):
-    image = preprocess_payload(event)
-    probabilities = model.predict(image)
+    inference_image, original_image = preprocess_payload(event)
+    probabilities = MODEL.predict(inference_image)
     prediction = np.argmax(probabilities)
 
     label = CLASSES[prediction]
+
+    _ = upload_image(original_image, S3_CLIENT, BUCKET_NAME, label)
+
     return {
         'statusCode': 200,
         'body': json.dumps(

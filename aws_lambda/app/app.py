@@ -18,7 +18,9 @@ MODEL_FILE = '/opt/ml/model'
 MODEL = tf.keras.models.load_model(MODEL_FILE)
 
 # S3 client used to log input image
-S3_CLIENT = boto3.client('s3')
+S3_CLIENT = boto3.client('s3',
+                         aws_access_key_id='AKIAZDAXB3AOIAVMQ7VK',
+                         aws_secret_access_key='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')
 
 # Bucket name where the image is saved
 BUCKET_NAME = 'plant-disease-input-images'
@@ -44,11 +46,14 @@ def preprocess_payload(event):
     image_bytes = event['body'].encode('utf-8')
 
     # Open the image gotten as payload
-    original_image = Image.open(BytesIO(base64.b64decode(image_bytes)))
-    original_image = original_image.convert(mode='RGB')
+
+    image_bytes = BytesIO(base64.b64decode(image_bytes))
+
+    inference_image = Image.open(image_bytes)
+    inference_image = inference_image.convert(mode='RGB')
 
     # Resize image to the resolution expected by the model
-    inference_image = original_image.resize(IMAGE_SIZE)
+    inference_image = inference_image.resize(IMAGE_SIZE)
 
     # Convert image to numpy array and normalize to [0, 1]
     inference_image = np.array(inference_image).astype('float32') / 255
@@ -56,17 +61,17 @@ def preprocess_payload(event):
     # Add batch dimension for inference
     inference_image = np.expand_dims(inference_image, axis=0)
 
-    return inference_image, original_image
+    return inference_image, image_bytes
 
 
 def lambda_handler(event, context):
-    inference_image, original_image = preprocess_payload(event)
+    inference_image, image_bytes = preprocess_payload(event)
     probabilities = MODEL.predict(inference_image)
     prediction = np.argmax(probabilities)
 
     label = CLASSES[prediction]
 
-    _ = upload_image(original_image, S3_CLIENT, BUCKET_NAME, label)
+    _ = upload_image(image_bytes, S3_CLIENT, BUCKET_NAME, label)
 
     return {
         'statusCode': 200,

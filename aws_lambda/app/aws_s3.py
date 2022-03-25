@@ -43,12 +43,12 @@ def list_buckets():
         print(f'{bucket["Name"]}')
 
 
-def upload_image(image, client, bucket, label):
+def upload_image(image_bytes, client, bucket, label):
 
     object_name = "{}/{}.png".format(label, str(uuid.uuid4()))
 
     try:
-        response = client.upload_file(image, bucket, object_name)
+        response = client.upload_fileobj(image_bytes, bucket, object_name)
 
         if response:
             logging.log('file {} uploaded succesfully'.format(object_name))

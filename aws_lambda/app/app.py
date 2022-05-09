@@ -49,11 +49,11 @@ def preprocess_payload(event):
 
     image_bytes = BytesIO(base64.b64decode(image_bytes))
 
-    inference_image = Image.open(image_bytes)
-    inference_image = inference_image.convert(mode='RGB')
+    original_image = Image.open(image_bytes)
+    original_image = original_image.convert(mode='RGB')
 
     # Resize image to the resolution expected by the model
-    inference_image = inference_image.resize(IMAGE_SIZE)
+    inference_image = original_image.resize(IMAGE_SIZE)
 
     # Convert image to numpy array and normalize to [0, 1]
     inference_image = np.array(inference_image).astype('float32') / 255
@@ -61,23 +61,24 @@ def preprocess_payload(event):
     # Add batch dimension for inference
     inference_image = np.expand_dims(inference_image, axis=0)
 
-    return inference_image, image_bytes
+    return inference_image, original_image
 
 
 def lambda_handler(event, context):
-    inference_image, image_bytes = preprocess_payload(event)
+    inference_image, original_image = preprocess_payload(event)
     probabilities = MODEL.predict(inference_image)
     prediction = np.argmax(probabilities)
 
     label = CLASSES[prediction]
 
-    _ = upload_image(image_bytes, S3_CLIENT, BUCKET_NAME, label)
+    _ = upload_image(original_image, S3_CLIENT, BUCKET_NAME, label)
 
     return {
         'statusCode': 200,
         'body': json.dumps(
             {
                 "predicted_label": label,
+                "label_index": int(prediction)
             }
         )
     }

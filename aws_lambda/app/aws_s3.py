@@ -1,5 +1,6 @@
 import logging
 import os
+import tempfile
 import uuid
 
 import boto3
@@ -43,18 +44,25 @@ def list_buckets():
         print(f'{bucket["Name"]}')
 
 
-def upload_image(image_bytes, client, bucket, label):
+def upload_image(image, client, bucket, label):
+    image_path = "{}.png".format(str(uuid.uuid4()))
 
-    object_name = "{}/{}.png".format(label, str(uuid.uuid4()))
+    with tempfile.TemporaryDirectory() as tmpdir:
+        os.chdir(tmpdir)
 
-    try:
-        response = client.upload_fileobj(image_bytes, bucket, object_name)
+        image.save(image_path)
 
-        if response:
-            logging.log('file {} uploaded succesfully'.format(object_name))
-    except ClientError as e:
-        logging.error(e)
-        return False
+        object_name = "{}/{}".format(label, image_path)
+
+        try:
+            response = client.upload_file(image_path, bucket, object_name)
+
+            if response:
+                logging.log('file {} uploaded succesfully'.format(object_name))
+
+        except ClientError as e:
+            logging.error(e)
+            return False
 
     return True
 
